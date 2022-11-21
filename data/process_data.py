@@ -4,12 +4,24 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    INPUT
+    messages_filepath - string, path to where the messages file is located
+    categories_filepath - string, path to where the corresponding messages's categories file is located
+
+    OUTPUT
+    df - dataframe merging both the messages and the corresponding categories
+
+    This function merges the messages.csv file and the categories.csv file
+    '''
+    
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = messages.merge(categories,how="inner",on=['id'])
     return df
 
 def clean_data(df):
+    
     categories=df[['id','categories']].copy()
     categories.set_index('id',inplace=True)
     # create a dataframe of the 36 individual category columns

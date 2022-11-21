@@ -10,6 +10,7 @@ from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
 import joblib
 from sqlalchemy import create_engine
+import pdb
 
 
 app = Flask(__name__)
@@ -29,6 +30,7 @@ def tokenize(text):
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('Messages', engine)
 
+
 # load model
 model = joblib.load("../models/classifier.pkl")
 
@@ -42,6 +44,14 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+    
+    liColumns=df.columns.tolist()
+    liColumns.remove('id')
+    liColumns.remove('message')
+    liColumns.remove('original')
+    type_counts = df.groupby('genre')[liColumns].sum()
+
+    
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -63,6 +73,71 @@ def index():
                     'title': "Genre"
                 }
             }
+        },
+        {
+            'data': [
+                Bar(
+                  x= type_counts.columns.tolist(),
+                  y= type_counts[type_counts.index=='direct'].values[0],
+                  name= 'direct'
+                ),
+                Bar(
+                  x= type_counts.columns.tolist(),
+                  y= type_counts[type_counts.index=='news'].values[0],
+                  name= 'news'
+                ),
+                Bar(
+                  x= type_counts.columns.tolist(),
+                  y= type_counts[type_counts.index=='social'].values[0],
+                  name= 'social'
+                ),
+            ],
+
+            'layout': {
+                'barmode':'stack',
+                'title': 'Distribution of Message Classifications',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Message Classification"
+                }
+            }
+            
+            
+        },
+        {
+            'data': [
+                Bar(
+                  x= type_counts.columns.tolist(),
+                  y= type_counts[type_counts.index=='direct'].values[0],
+                  name= 'direct'
+                ),
+                Bar(
+                  x= type_counts.columns.tolist(),
+                  y= type_counts[type_counts.index=='news'].values[0],
+                  name= 'news'
+                ),
+                Bar(
+                  x= type_counts.columns.tolist(),
+                  y= type_counts[type_counts.index=='social'].values[0],
+                  name= 'social'
+                ),
+            ],
+
+            'layout': {
+                'barmode':'stack',
+                'barnorm': 'percent',
+                'title': 'Share of Message genres within Classifications',
+                'yaxis': {
+                    'title': "%"
+                },
+                'xaxis': {
+                    'title': "Message Classification"
+                }
+            }
+            
+            
         }
     ]
     

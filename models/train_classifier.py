@@ -24,6 +24,23 @@ nltk.download('omw-1.4')
 
 
 def load_data(database_filepath):
+    '''
+    INPUT
+    database_filepath - pandas dataframe
+
+    OUTPUT
+    X - A matrix holding all of the variables you want to consider when predicting the response
+    y - the corresponding response vector
+    category_names - gives all the names of the dependent variables
+
+    This function cleans df using the following steps to produce X and y:
+    1. reads the Messages table from the sqlite database
+    2. Create X as the actual message text
+    3. Create y as all the tags that message has been classified as
+    4. Drop columns without any variability
+    5. Get names of all y columns as category_names
+    '''
+    
     # load data from database
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql_query("select * from Messages", engine)
@@ -37,6 +54,19 @@ def load_data(database_filepath):
     return X,y,category_names
 
 def tokenize(text):
+    '''
+    INPUT
+    text - input string
+
+    OUTPUT
+    clean_tokens - A list containing tokens of lemmatized and lower cased words in the string
+
+    This function does text transformations on the input string:
+    1. reads the input stringMessages table from the sqlite database
+    2. Tokenize the string
+    3. Lemmatizes the string and then converts them into lower case
+    4. Appends each of these to a list
+    '''
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -49,6 +79,16 @@ def tokenize(text):
 
 
 def build_model():
+    '''
+    INPUT
+    None
+
+    OUTPUT
+    dictModels - Dictionary containing Different pipelines
+
+    This function creates dictionary containing pipelines having different parameters:
+
+    '''
     dictModels={}
     modelsparams = {\
          'LogisticRegression':
@@ -90,6 +130,21 @@ def build_model():
     return dictModels
         
 def display_results(y_test, y_pred):
+    '''
+    INPUT
+    y_test: List of dependent variables values from the testing dataset
+    y_pred: List of predicted answers
+
+    OUTPUT
+    accuracy - Returns how close the predicted answers were to the test dataset actual values
+
+    This function displays the classification report of the different models and return the accuracy of the models:
+    1. reads the input stringMessages table from the sqlite database
+    2. Tokenize the string
+    3. Lemmatizes the string and then converts them into lower case
+    4. Appends each of these to a list
+    '''
+    
     class_report = classification_report(y_test, y_pred)
     accuracy = (y_pred == y_test).mean()
     print("Classification Report:\n", class_report)
@@ -97,6 +152,23 @@ def display_results(y_test, y_pred):
     return float(accuracy)
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    INPUT
+    model: classifier model
+    X_test: List of independent variables values from the testing dataset
+    Y_test: List of dependent variables values from the testing dataset
+    category_names - gives all the names of the dependent variables
+
+    OUTPUT
+    accuracy - Returns how close the predicted answers were to the test dataset actual values
+
+    This function predicts the message category form the messages in the test dataset:
+    1. predict the message categories from the messages in the test dataset for the model passed to the function 
+    2. Get accuracy of the predicted category by calling the display_results function
+    3. Append accuracy to list
+    4. Get average accuracy of the model
+    '''
+    
     liAccuracy=[]
     
     Y_pred = model.predict(X_test)
@@ -112,11 +184,28 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    INPUT
+    model: classifier model
+    model_filepath: path to store the model
+
+    This function stores the model as a pickle file in the specified path:
+    '''
     pickle.dump(model, open(model_filepath, "wb"))
     return True
 
 
 def main():
+    '''
+    This function is the starting point for training the classifier:
+    1. reads arguments provided via the command line. Arguments are path of the database and path to store the classifier model
+    2. Reads data from the database
+    3. splits the dataset into training and test datasets
+    4. calls the build_model functions to get a dictionary of viable models for the classifier
+    5. Trains each of the models using the training dataset
+    6. Evaluates each model and selects the best model based on it's accuracy on the test dataset
+    7. Saves the best model/classifer to a pickle file
+    '''
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
