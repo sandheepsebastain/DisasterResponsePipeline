@@ -1,5 +1,7 @@
 # Disaster Response Pipeline Project
 
+This project aims to build a model to classify a message coming through communication lines or social media platforms like Twitter or Facebook, during a live disaster by looking at historical messages sent during a disaster. This model will help classify and send the relevant messages to the right emergency organization to help them better respond to future disasters.
+
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
