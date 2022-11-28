@@ -21,6 +21,16 @@ def load_data(messages_filepath, categories_filepath):
     return df
 
 def clean_data(df):
+    '''
+    INPUT
+    df - pandas data frame, raw data passed to the functioon
+
+    OUTPUT
+    df - pandas data frame, cleaned and processed data frame
+
+
+    This function cleans raw data and processes information to make it useful for ML model
+    '''
     
     categories=df[['id','categories']].copy()
     categories.set_index('id',inplace=True)
@@ -59,9 +69,19 @@ def clean_data(df):
     
 
 def save_data(df, database_filename):
+    '''
+    INPUT
+    df - pandas data frame
+    database_filename - string, path to where the corresponding messages's categories file is located
+
+    OUTPUT
+    None
+
+    This function saves data in a dataframe to the messages table in a sqlite database saved in a path specified by an input
+    '''
     engine = create_engine('sqlite:///'+database_filename)
     print(df.head())
-    df.to_sql('Messages', engine, index=False)
+    df.to_sql('Messages', engine, index=False, if_exists='replace')
     pass  
 
 
