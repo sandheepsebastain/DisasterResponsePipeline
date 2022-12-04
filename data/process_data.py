@@ -52,7 +52,10 @@ def clean_data(df):
         categories[column] = categories[column].apply(lambda x:x[-1:])
     
         # convert column from string to numeric
+        
         categories[column] = categories[column].astype(int)
+        categories[column] = categories.where(categories[column] == 0, 1)
+        print(column+":"+str(max(categories[column]))+":"+str(min(categories[column])))
         
     #Merging the categories dataframe back to the original dataframe
     del df['categories']
